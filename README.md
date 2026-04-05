@@ -1,3 +1,10 @@
+# Video Demo: https://drive.google.com/file/d/17MjHJJogqC1i0J0ijTxy1UJExzPbwN1o/view?usp=sharing
+# Github Repo: https://github.com/tbharati876/Finance-Data-Processing-and-Access-Control-Backend
+# Deployed URL: https://finance-data-processing-and-access-c4zz.onrender.com
+# Live URL: https://unsignifiable-tera-overbold.ngrok-free.dev/
+# Swagger UI: https://unsignifiable-tera-overbold.ngrok-free.dev/docs
+
+
 # 📊 Finance Dashboard Backend
 
 ### Backend Intern Assignment: Financial Management & RBAC System
