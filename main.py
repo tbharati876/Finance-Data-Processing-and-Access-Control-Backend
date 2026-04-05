@@ -7,12 +7,10 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Query, Depends, Header
 from fastapi.responses import HTMLResponse
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, func
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from pyngrok import ngrok
 import uvicorn
 
-# --- 1. DATABASE & MODELS SETUP ---
 DATABASE_URL = "sqlite:///./finance_dashboard.db"
 Base = declarative_base()
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -33,14 +31,13 @@ class Transaction(Base):
     __tablename__ = "transactions"
     id = Column(Integer, primary_key=True, index=True)
     amount = Column(Float)
-    type = Column(String) # "Income" or "Expense"
+    type = Column(String) 
     category = Column(String)
     description = Column(String)
     date = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 
-# Seed Initial Data
 db = SessionLocal()
 if not db.query(Transaction).first():
     db.add_all([
@@ -51,7 +48,7 @@ if not db.query(Transaction).first():
     db.commit()
 db.close()
 
-# --- 2. BACKEND LOGIC ---
+# BACKEND LOGIC 
 app = FastAPI()
 
 def get_db():
@@ -82,7 +79,7 @@ def add_tx(amount: float, type: str, category: str, user_role: str = Header("Vie
     db.commit()
     return {"status": "success"}
 
-# --- 3. FRONTEND ---
+# FRONTEND 
 @app.get("/", response_class=HTMLResponse)
 def home():
     return """
@@ -128,12 +125,12 @@ def home():
         <script>
             let role = "Viewer";
             function setRole(r) { role = r; document.getElementById('role_label').innerText = "Role: "+r; load(); }
-            
+
             async function load() {
                 const txRes = await fetch('/api/transactions', {headers: {'user-role': role}});
                 const txs = await txRes.json();
                 document.getElementById('table_body').innerHTML = txs.map(t => `<tr><td>${t.category}</td><td>${t.type}</td><td>$${t.amount}</td></tr>`).join('');
-                
+
                 const sumRes = await fetch('/api/summary', {headers: {'user-role': role}});
                 const sDiv = document.getElementById('summary_div');
                 if(sumRes.ok) {
@@ -143,7 +140,7 @@ def home():
                     document.getElementById('s_ex').innerText = "$"+s.expenses;
                     document.getElementById('s_net').innerText = "$"+s.balance;
                 } else { sDiv.style.display = 'none'; }
-                
+
                 document.getElementById('admin_div').style.display = (role === 'Admin') ? 'block' : 'none';
             }
             async function save() {
@@ -158,15 +155,24 @@ def home():
     </html>
     """
 
-# --- 4. DEPLOYMENT (NGROK + UVICORN) ---
+# DEPLOYMENT 
 NGROK_TOKEN = "36mSHpSl4DWk4VZO6zTudKO3Piz_2ReYvKNYAz8zPKgUJRMxH"
 
 def setup_tunnel():
+    ngrok.kill()
     ngrok.set_auth_token(NGROK_TOKEN)
-    # Open a tunnel on port 10000 (Render's default port)
+    # Open tunnel on port 10000 (Render's port)
     public_url = ngrok.connect(10000).public_url
-    print(f"\n\n🚀 FINANCE DASHBOARD LIVE AT: {public_url}\n\n")
+    print(f"\n\n FINANCE DASHBOARD LIVE AT: {public_url}\n\n")
+
+
+def run_uvicorn():
+    uvicorn.run(app, host="0.0.0.0", port=10000)
 
 if __name__ == "__main__":
+   
+    thread = threading.Thread(target=run_uvicorn)
+    thread.start()
+
+    time.sleep(2)
     setup_tunnel()
-    uvicorn.run(app, host="0.0.0.0", port=10000)
