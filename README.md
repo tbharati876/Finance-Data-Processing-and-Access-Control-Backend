@@ -3,6 +3,8 @@
 ## Deployed URL: https://finance-data-processing-and-access-c4zz.onrender.com
 ## Live URL: https://unsignifiable-tera-overbold.ngrok-free.dev/
 ## Swagger UI: https://unsignifiable-tera-overbold.ngrok-free.dev/docs
+## Colab Code Book: https://colab.research.google.com/drive/1iA0FWVsV09cs_GOEPAbFXqs7YAy-OhUI?usp=sharing
+
 
 
 # 📊 Finance Dashboard Backend
